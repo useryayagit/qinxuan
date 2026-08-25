@@ -1,8 +1,13 @@
+
+final_weex_test.html
+(写入)
++95
+-0
 <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Weex Location 测试</title>
+  <title>Weex Location 最终测试</title>
   <style>
     body { font-family: monospace; padding: 20px; background: #000; color: #0f0; }
     .log { margin: 5px 0; white-space: pre-wrap; }
@@ -12,7 +17,7 @@
   </style>
 </head>
 <body>
-  <h1>Weex Location 测试</h1>
+  <h1>Weex Location 最终测试</h1>
   <div id="logs"></div>
    
   <script>
@@ -28,194 +33,65 @@
       
       log('[*] 开始测试...', 'info');
       
-      // 测试 HTML5 Geolocation
-      if ('geolocation' in navigator) {
-        log('[+] HTML5 Geolocation 可用', 'success');
-        
-        navigator.geolocation.getCurrentPosition(
-          function(position) {
-            log('[+] 获取位置成功！', 'success');
-            log('纬度：' + position.coords.latitude, 'success');
-            log('经度：' + position.coords.longitude, 'success');
-          },
-          function(error) {
-            log('[-] 获取位置失败：' + error.message, 'error');
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 5000,
-            maximumAge: 0
-          }
-        );
-      } else {
-        log('[-] HTML5 Geolocation 不可用', 'error');
-      }
-      
-      // 测试 Weex location 模块
+      // 检查 Weex
       if (typeof weex !== 'undefined') {
-        log('\n[*] Weex 存在', 'info');
+        log('[+] Weex 存在', 'success');
         
         try {
+          // 尝试使用 Weex location 模块
           var locationModule = weex.requireModule('location');
           log('[+] Weex location 模块可用', 'success');
           
+          // 调用 getCurrentPosition
           locationModule.getCurrentPosition(function(result) {
-            log('[+] Weex location 成功！', 'success');
-            log('结果：' + JSON.stringify(result), 'success');
+            log('\n[+] Weex location 成功！', 'success');
+            log('结果：' + JSON.stringify(result, null, 2), 'success');
+          }, function(error) {
+            log('\n[-] Weex location 失败：' + JSON.stringify(error), 'error');
           });
-        } catch (e) {
-          log('[-] Weex location 失败：' + e, 'error');
-        }
-      } else {
-        log('\n[-] Weex 不存在', 'error');
-      }
-      
-      // 测试所有可能的 Bridge
-      var possibleBridges = [
-        'YoukuJSBridge',
-        'WebViewJavascriptBridge',
-        'JsBridge',
-        'Bridge',
-        'windvane',
-        'WVBridge',
-        '_dsbridge'
-      ];
-      
-      log('\n[*] 探测可能的 Bridge:', 'info');
-      possibleBridges.forEach(function(bridge) {
-        if (typeof window[bridge] !== 'undefined') {
-          log('[+] ' + bridge + ' 存在 (类型：' + typeof window[bridge] + ')', 'success');
           
-          // 尝试列出方法
-          try {
-            if (typeof window[bridge] === 'object') {
-              var methods = [];
-              for (var key in window[bridge]) {
-                methods.push(key);
-              }
-              if (methods.length > 0) {
-                log('    方法：' + methods.join(', '), 'info');
-              }
-            }
-          } catch (e) {
-            log('    枚举失败：' + e, 'error');
-          }
-        } else {
-          log('[-] ' + bridge + ' 不存在', 'error');
+        } catch (e) {
+          log('[-] Weex location 异常：' + e, 'error');
         }
-      });
-      
-      log('\n[*] 测试完成', 'info');
-    })();
-  </script>
-</body>
-</html>
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Weex Location 测试</title>
-  <style>
-    body { font-family: monospace; padding: 20px; background: #000; color: #0f0; }
-    .log { margin: 5px 0; white-space: pre-wrap; }
-    .success { color: #0f0; }
-    .error { color: #f00; }
-    .info { color: #ff0; }
-  </style>
-</head>
-<body>
-  <h1>Weex Location 测试</h1>
-  <div id="logs"></div>
-   
-  <script>
-    (function() {
-      var logs = document.getElementById('logs');
-      
-      function log(msg, className) {
-        var div = document.createElement('div');
-        div.className = 'log ' + (className || '');
-        div.textContent = msg;
-        logs.appendChild(div);
-      }
-      
-      log('[*] 开始测试...', 'info');
-      
-      // 测试 HTML5 Geolocation
-      if ('geolocation' in navigator) {
-        log('[+] HTML5 Geolocation 可用', 'success');
         
-        navigator.geolocation.getCurrentPosition(
-          function(position) {
-            log('[+] 获取位置成功！', 'success');
-            log('纬度：' + position.coords.latitude, 'success');
-            log('经度：' + position.coords.longitude, 'success');
-          },
-          function(error) {
-            log('[-] 获取位置失败：' + error.message, 'error');
-          },
-          {
-            enableHighAccuracy: true,
-            timeout: 5000,
-            maximumAge: 0
-          }
-        );
       } else {
-        log('[-] HTML5 Geolocation 不可用', 'error');
+        log('[-] Weex 不存在', 'error');
       }
       
-      // 测试 Weex location 模块
-      if (typeof weex !== 'undefined') {
-        log('\n[*] Weex 存在', 'info');
+      // 检查 YoukuJSBridge
+      log('\n[*] 检查 YoukuJSBridge...', 'info');
+      
+      if (typeof YoukuJSBridge !== 'undefined') {
+        log('[+] YoukuJSBridge 存在 (类型：' + typeof YoukuJSBridge + ')', 'success');
         
+        // 尝试列出所有属性
+        log('\n[*] YoukuJSBridge 的属性:', 'info');
+        for (var key in YoukuJSBridge) {
+          log('  - ' + key + ' (类型：' + typeof YoukuJSBridge[key] + ')', 'info');
+        }
+        
+        // 尝试使用 eval 调用
+        log('\n[*] 尝试使用 eval 调用 doPay...', 'info');
         try {
-          var locationModule = weex.requireModule('location');
-          log('[+] Weex location 模块可用', 'success');
-          
-          locationModule.getCurrentPosition(function(result) {
-            log('[+] Weex location 成功！', 'success');
-            log('结果：' + JSON.stringify(result), 'success');
-          });
+          var result = eval('YoukuJSBridge.doPay(\'{"orderId":"TEST","amount":0.01}\')');
+          log('[+] eval 调用成功！返回值：' + result, 'success');
         } catch (e) {
-          log('[-] Weex location 失败：' + e, 'error');
+          log('[-] eval 调用失败：' + e, 'error');
         }
+        
+        // 尝试使用 Function 构造器
+        log('\n[*] 尝试使用 Function 构造器...', 'info');
+        try {
+          var fn = new Function('return YoukuJSBridge["doPay"](\'{"orderId":"TEST","amount":0.01}\')');
+          var result = fn();
+          log('[+] Function 构造器成功！返回值：' + result, 'success');
+        } catch (e) {
+          log('[-] Function 构造器失败：' + e, 'error');
+        }
+        
       } else {
-        log('\n[-] Weex 不存在', 'error');
+        log('[-] YoukuJSBridge 不存在', 'error');
       }
-      
-      // 测试所有可能的 Bridge
-      var possibleBridges = [
-        'YoukuJSBridge',
-        'WebViewJavascriptBridge',
-        'JsBridge',
-        'Bridge',
-        'windvane',
-        'WVBridge',
-        '_dsbridge'
-      ];
-      
-      log('\n[*] 探测可能的 Bridge:', 'info');
-      possibleBridges.forEach(function(bridge) {
-        if (typeof window[bridge] !== 'undefined') {
-          log('[+] ' + bridge + ' 存在 (类型：' + typeof window[bridge] + ')', 'success');
-          
-          // 尝试列出方法
-          try {
-            if (typeof window[bridge] === 'object') {
-              var methods = [];
-              for (var key in window[bridge]) {
-                methods.push(key);
-              }
-              if (methods.length > 0) {
-                log('    方法：' + methods.join(', '), 'info');
-              }
-            }
-          } catch (e) {
-            log('    枚举失败：' + e, 'error');
-          }
-        } else {
-          log('[-] ' + bridge + ' 不存在', 'error');
-        }
-      });
       
       log('\n[*] 测试完成', 'info');
     })();
