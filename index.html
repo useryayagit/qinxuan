@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>YoukuJSBridge 正确调用方式</title>
+  <title>YoukuJSBridge 正确调用测试</title>
   <style>
     body { font-family: monospace; padding: 20px; background: #000; color: #0f0; }
     .log { margin: 5px 0; white-space: pre-wrap; }
@@ -12,7 +12,7 @@
   </style>
 </head>
 <body>
-  <h1>YoukuJSBridge 正确调用方式</h1>
+  <h1>YoukuJSBridge 正确调用测试</h1>
   <div id="logs"></div>
    
   <script>
@@ -26,8 +26,8 @@
         logs.appendChild(div);
       }
       
-      log('[*] 开始测试正确的调用方式...', 'info');
-      log('[*] YoukuJSBridge 类型：' + typeof YoukuJSBridge, 'info');
+      log('[*] 开始测试...', 'info');
+      log('[*] YoukuJSBridge: ' + YoukuJSBridge, 'info');
       
       if (typeof YoukuJSBridge !== 'undefined') {
         log('\n[+] YoukuJSBridge 存在！', 'success');
@@ -40,30 +40,30 @@
         }
         log(props.join('\n'), 'info');
         
-        // 方式 1: 使用 eval 调用
-        log('\n[*] 方式 1: 使用 eval 调用', 'info');
+        // 方式 1: 尝试调用 'a' 方法（统一入口）
+        log('\n[*] 方式 1: 调用 a() 方法（统一入口）', 'info');
         try {
-          var result = eval('YoukuJSBridge.doPay(\'{"orderId":"TEST","amount":0.01}\')');
-          log('[+] eval 调用成功！\n返回值：' + result, 'success');
+          // a 方法可能接受 [method_name, params]
+          YoukuJSBridge.a(['doPay', '{"orderId":"TEST","amount":0.01}']);
+          log('[+] a() 调用成功！', 'success');
         } catch (e) {
-          log('[-] eval 调用失败：' + e, 'error');
+          log('[-] a() 失败：' + e, 'error');
         }
         
-        // 方式 2: 使用 Function 构造器
-        log('\n[*] 方式 2: 使用 Function 构造器', 'info');
+        // 方式 2: 尝试直接调用 doPay
+        log('\n[*] 方式 2: 直接调用 doPay', 'info');
         try {
-          var fn = new Function('return YoukuJSBridge["doPay"](\'{"orderId":"TEST","amount":0.01}\')');
-          var result = fn();
-          log('[+] Function 构造器成功！\n返回值：' + result, 'success');
+          var result = YoukuJSBridge.doPay('{"orderId":"TEST","amount":0.01}');
+          log('[+] doPay 成功！返回值：' + result, 'success');
         } catch (e) {
-          log('[-] Function 构造器失败：' + e, 'error');
+          log('[-] doPay 失败：' + e, 'error');
         }
         
         // 方式 3: 使用 apply
         log('\n[*] 方式 3: 使用 apply', 'info');
         try {
           var result = YoukuJSBridge.doPay.apply(YoukuJSBridge, ['{"orderId":"TEST","amount":0.01}']);
-          log('[+] apply 成功！\n返回值：' + result, 'success');
+          log('[+] apply 成功！返回值：' + result, 'success');
         } catch (e) {
           log('[-] apply 失败：' + e, 'error');
         }
@@ -72,33 +72,38 @@
         log('\n[*] 方式 4: 使用 call', 'info');
         try {
           var result = YoukuJSBridge.doPay.call(YoukuJSBridge, '{"orderId":"TEST","amount":0.01}');
-          log('[+] call 成功！\n返回值：' + result, 'success');
+          log('[+] call 成功！返回值：' + result, 'success');
         } catch (e) {
           log('[-] call 失败：' + e, 'error');
         }
         
-        // 方式 5: 使用方括号 + eval
-        log('\n[*] 方式 5: 使用方括号 + eval', 'info');
+        // 方式 5: 使用 eval
+        log('\n[*] 方式 5: 使用 eval', 'info');
         try {
-          var method = 'doPay';
-          var result = eval('YoukuJSBridge["' + method + '"](\'{"orderId":"TEST","amount":0.01}\')');
-          log('[+] 方括号+eval 成功！\n返回值：' + result, 'success');
+          var result = eval('YoukuJSBridge.doPay(\'{"orderId":"TEST","amount":0.01}\')');
+          log('[+] eval 成功！返回值：' + result, 'success');
         } catch (e) {
-          log('[-] 方括号+eval 失败：' + e, 'error');
+          log('[-] eval 失败：' + e, 'error');
         }
         
-        // 测试其他方法
-        log('\n[*] 测试其他方法（使用 eval）:', 'info');
+        // 方式 6: 使用 Function 构造器
+        log('\n[*] 方式 6: 使用 Function 构造器', 'info');
+        try {
+          var fn = new Function('return YoukuJSBridge["doPay"](\'{"orderId":"TEST","amount":0.01}\')');
+          var result = fn();
+          log('[+] Function 构造器成功！返回值：' + result, 'success');
+        } catch (e) {
+          log('[-] Function 构造器失败：' + e, 'error');
+        }
         
-        ['getGeolocation', 'loadUrl', 'setShareInfo', 'addItem2Cart', 'oneKeyAddCart'].forEach(function(method) {
-          try {
-            var code = 'YoukuJSBridge.' + method + '(\'{}\')';
-            var result = eval(code);
-            log('[+] ' + method + ' 成功！返回值：' + result, 'success');
-          } catch (e) {
-            log('[-] ' + method + ' 失败：' + e, 'error');
-          }
-        });
+        // 方式 7: 尝试调用 b 方法（可能是另一个统一入口）
+        log('\n[*] 方式 7: 调用 b() 方法', 'info');
+        try {
+          var result = YoukuJSBridge.b('doPay', '{"orderId":"TEST","amount":0.01}');
+          log('[+] b() 成功！返回值：' + result, 'success');
+        } catch (e) {
+          log('[-] b() 失败：' + e, 'error');
+        }
         
       } else {
         log('\n[-] YoukuJSBridge 不存在', 'error');
