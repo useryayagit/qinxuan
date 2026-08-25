@@ -234,7 +234,16 @@
       alert('[*] 页面加载完成\n[*] YoukuJSBridge 状态：' + (typeof YoukuJSBridge));
        
       if (typeof YoukuJSBridge !== 'undefined') {
-        alert('[+] YoukuJSBridge 可用！\n[*] 可用方法：' + Object.keys(YoukuJSBridge).join(', '));
+         var methods = [];
+        for (var key in YoukuJSBridge) {
+          if (typeof YoukuJSBridge[key] === 'function') {
+            methods.push(key);
+          }
+        }
+        
+        // 格式化输出
+        var methodsStr = methods.join('\n  - ');
+        alert('[+] YoukuJSBridge 可用！\n\n[*] 共 ' + methods.length + ' 个方法:\n\n  - ' + methodsStr);
       } else {
         alert('[-] YoukuJSBridge 不可用');
       }
