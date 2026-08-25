@@ -2,76 +2,85 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>简单测试</title>
+  <title>直接测试</title>
   <style>
-    body { font-family: monospace; padding: 20px; background: #1a1a1a; color: #0f0; }
-    .log { margin: 5px 0; }
+    body { font-family: monospace; padding: 20px; background: #000; color: #0f0; }
+    .log { margin: 5px 0; white-space: pre-wrap; }
     .success { color: #0f0; }
     .error { color: #f00; }
     .info { color: #ff0; }
   </style>
 </head>
 <body>
-  <h1>YoukuJSBridge 测试</h1>
+  <h1>YoukuJSBridge 直接测试</h1>
   <div id="logs"></div>
    
   <script>
-    var logs = document.getElementById('logs');
-    
-    function log(msg, className) {
-      var div = document.createElement('div');
-      div.className = 'log ' + (className || '');
-      div.textContent = msg;
-      logs.appendChild(div);
-    }
-    
-    // 延迟 2 秒执行，确保 YoukuJSBridge 已注入
-    setTimeout(function() {
-      log('[*] 开始探测...', 'info');
-      log('[*] typeof YoukuJSBridge: ' + typeof YoukuJSBridge, 'info');
+    // 立即执行，不等待 onload
+    (function() {
+      var logs = document.getElementById('logs');
+      
+      function log(msg, className) {
+        var div = document.createElement('div');
+        div.className = 'log ' + (className || '');
+        div.textContent = msg;
+        logs.appendChild(div);
+      }
+      
+      log('[*] 脚本开始执行...', 'info');
+      log('[*] navigator.userAgent: ' + navigator.userAgent, 'info');
+      log('[*] location.href: ' + location.href, 'info');
+      log('[*] typeof YoukuJSBridge: ' + (typeof YoukuJSBridge), 'info');
       
       if (typeof YoukuJSBridge !== 'undefined') {
-        log('[+] YoukuJSBridge 存在！', 'success');
+        log('\n[+] YoukuJSBridge 存在！', 'success');
         
-        // 尝试直接调用
+        // 尝试调用
         try {
-          log('[*] 调用 doPay...', 'info');
+          log('\n[*] 测试 doPay...', 'info');
           var result = YoukuJSBridge.doPay('{"orderId":"TEST","amount":0.01}');
-          log('[+] doPay 成功！返回值：' + result, 'success');
+          log('[+] doPay 成功！\n返回值：' + result, 'success');
         } catch (e) {
-          log('[-] doPay 失败：' + e.message, 'error');
+          log('[-] doPay 失败：' + e, 'error');
         }
         
         try {
-          log('[*] 调用 getGeolocation...', 'info');
+          log('\n[*] 测试 getGeolocation...', 'info');
           var result = YoukuJSBridge.getGeolocation('{}');
-          log('[+] getGeolocation 成功！返回值：' + result, 'success');
+          log('[+] getGeolocation 成功！\n返回值：' + result, 'success');
         } catch (e) {
-          log('[-] getGeolocation 失败：' + e.message, 'error');
+          log('[-] getGeolocation 失败：' + e, 'error');
         }
         
         try {
-          log('[*] 调用 loadUrl...', 'info');
+          log('\n[*] 测试 loadUrl...', 'info');
           YoukuJSBridge.loadUrl('{"url":"about:blank"}');
           log('[+] loadUrl 成功！', 'success');
         } catch (e) {
-          log('[-] loadUrl 失败：' + e.message, 'error');
+          log('[-] loadUrl 失败：' + e, 'error');
         }
         
         try {
-          log('[*] 调用 setShareInfo...', 'info');
+          log('\n[*] 测试 setShareInfo...', 'info');
           YoukuJSBridge.setShareInfo('{"title":"Test"}');
           log('[+] setShareInfo 成功！', 'success');
         } catch (e) {
-          log('[-] setShareInfo 失败：' + e.message, 'error');
+          log('[-] setShareInfo 失败：' + e, 'error');
         }
         
       } else {
-        log('[-] YoukuJSBridge 不存在', 'error');
+        log('\n[-] YoukuJSBridge 不存在', 'error');
+        log('\n[*] 可用全局对象:', 'info');
+        for (var key in window) {
+          if (key.toLowerCase().indexOf('bridge') !== -1 || 
+              key.toLowerCase().indexOf('youku') !== -1) {
+            log('  - ' + key, 'info');
+          }
+        }
       }
       
-      log('[*] 探测完成', 'info');
-    }, 2000);
+      log('\n[*] 测试完成', 'info');
+    })();
   </script>
 </body>
 </html>
